@@ -1,7 +1,10 @@
-# TODO: Add Profile Picture Preview on Selection and Display After Save
+# TODO: Add Friend Feature Using Username
 
-- [x] Add event listener to profilePic input for 'change' event in script.js
-- [x] In the event handler, read the selected file as data URL and set to profilePicPreview backgroundImage
-- [x] Clear the preview if no file is selected
-- [ ] Modify saveProfile to update the user's avatar in the sidebar immediately after saving
-- [ ] Test the preview and save functionality in the browser
+- [x] Add HTML for "Find Friends" list and input in sidebar (index.html)
+- [x] Add CSS styles for the find friends section (style.css)
+- [x] Add friends structure in DB: friends/{uid}/{friendUid}
+- [x] Implement addFriend function in script.js: add by uid from list or username input
+- [x] Modify loadUsers to load only friends (or friends + self)
+- [x] Add loadAllUsers to show non-friends with add button
+- [x] Update selectChat to work with friends
+- [x] Test the add friend functionality

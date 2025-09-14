@@ -23,11 +23,22 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="sidebar-header">
-        <h3>Users</h3>
+        <h3>Friends</h3>
         <button onclick="logout()">Logout</button>
       </div>
       <div class="user-list" id="userList">
-        <!-- User items will be populated here -->
+        <!-- Friend items will be populated here -->
+      </div>
+      <div class="find-friends">
+        <h4>Find Friends</h4>
+        <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 10px;">Share the app link with others so they can join and appear here.</p>
+        <div class="add-friend">
+          <input type="text" id="friendUsername" placeholder="Enter username">
+          <button onclick="addFriend()">Add Friend</button>
+        </div>
+        <div class="all-users-list" id="allUsersList">
+          <!-- All users will be populated here -->
+        </div>
       </div>
     </div>
 

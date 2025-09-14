@@ -200,39 +200,148 @@ function loadMessages() {
   });
 }
 
-// Load users list
+// Load friends list
 function loadUsers() {
   const userListDiv = document.getElementById("userList");
   userListDiv.innerHTML = "";
-  db.ref("users").on("value", snapshot => {
-    const users = snapshot.val();
-    if (!users) return;
-    Object.entries(users).forEach(([uid, user]) => {
-      if (!user) return;
-      const div = document.createElement("div");
-      div.classList.add("user-item");
-      div.setAttribute("data-uid", uid);
-      div.onclick = () => selectChat(uid);
-      if (uid === auth.currentUser.uid) {
-        div.classList.add("active");
-      }
-      div.innerHTML = `
-        <div class="user-avatar" style="background: ${user.profilePic ? `url(${user.profilePic})` : 'linear-gradient(135deg, #ff9a9e, #fecfef)'}; background-size: cover; background-position: center;">
-          ${user.profilePic ? '' : user.name.charAt(0).toUpperCase()}
-        </div>
-        <div class="user-info">
-          <div class="user-name">${user.name}</div>
-          <div class="user-status">${user.online ? "Online" : "Offline"}</div>
-        </div>
-      `;
-      if (user.online) {
-        const onlineDot = document.createElement("div");
-        onlineDot.classList.add("online-indicator");
-        div.querySelector(".user-avatar").appendChild(onlineDot);
-      }
-      userListDiv.appendChild(div);
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  // Load friends
+  db.ref(`friends/${currentUser.uid}`).once('value', friendsSnapshot => {
+    const friends = friendsSnapshot.val() || {};
+    const friendUids = Object.keys(friends);
+
+    // Also include self
+    friendUids.push(currentUser.uid);
+
+    // Load user data for each friend
+    friendUids.forEach(uid => {
+      db.ref(`users/${uid}`).once('value', userSnapshot => {
+        const user = userSnapshot.val();
+        if (!user) return;
+        const div = document.createElement("div");
+        div.classList.add("user-item");
+        div.setAttribute("data-uid", uid);
+        div.onclick = () => selectChat(uid);
+        if (uid === currentUser.uid) {
+          div.classList.add("active");
+        }
+        div.innerHTML = `
+          <div class="user-avatar" style="background: ${user.profilePic ? `url(${user.profilePic})` : 'linear-gradient(135deg, #ff9a9e, #fecfef)'}; background-size: cover; background-position: center;">
+            ${user.profilePic ? '' : user.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="user-info">
+            <div class="user-name">${user.name}</div>
+            <div class="user-status">${user.online ? "Online" : "Offline"}</div>
+          </div>
+        `;
+        if (user.online) {
+          const onlineDot = document.createElement("div");
+          onlineDot.classList.add("online-indicator");
+          div.querySelector(".user-avatar").appendChild(onlineDot);
+        }
+        userListDiv.appendChild(div);
+      });
     });
   });
+}
+
+// Load all users for find friends
+function loadAllUsers() {
+  const allUsersDiv = document.getElementById("allUsersList");
+  allUsersDiv.innerHTML = "";
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  // Get friends first
+  db.ref(`friends/${currentUser.uid}`).once('value', friendsSnap => {
+    const friends = friendsSnap.val() || {};
+    const friendUids = Object.keys(friends);
+
+    // Then get all users
+    db.ref("users").once('value', snapshot => {
+      const users = snapshot.val();
+      if (!users) return;
+
+      Object.entries(users).forEach(([uid, user]) => {
+        if (!user || uid === currentUser.uid || friendUids.includes(uid)) return; // exclude self and friends
+
+        const div = document.createElement("div");
+        div.classList.add("user-item");
+        div.innerHTML = `
+          <div class="user-avatar" style="background: ${user.profilePic ? `url(${user.profilePic})` : 'linear-gradient(135deg, #ff9a9e, #fecfef)'}; background-size: cover; background-position: center;">
+            ${user.profilePic ? '' : user.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="user-info">
+            <div class="user-name">${user.name}</div>
+            <div class="user-status">${user.online ? "Online" : "Offline"}</div>
+          </div>
+          <button onclick="addFriend('${uid}')">Add</button>
+        `;
+        if (user.online) {
+          const onlineDot = document.createElement("div");
+          onlineDot.classList.add("online-indicator");
+          div.querySelector(".user-avatar").appendChild(onlineDot);
+        }
+        allUsersDiv.appendChild(div);
+      });
+    });
+  });
+}
+
+function addFriend(uid) {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  if (!uid) {
+    // fallback to username input method
+    const username = document.getElementById('friendUsername').value.trim();
+    if (!username) return;
+
+    // Search for user with name == username
+    db.ref('users').orderByChild('name').equalTo(username).once('value', snapshot => {
+      const users = snapshot.val();
+      if (users) {
+        const friendUid = Object.keys(users)[0]; // assuming unique names
+        if (friendUid !== currentUser.uid) {
+          // Check if already friend
+          db.ref(`friends/${currentUser.uid}/${friendUid}`).once('value', friendSnap => {
+            if (friendSnap.exists()) {
+              alert('Already friends!');
+            } else {
+              // Add to friends
+              db.ref(`friends/${currentUser.uid}/${friendUid}`).set(true);
+              alert('Friend added!');
+              document.getElementById('friendUsername').value = '';
+              loadUsers(); // refresh list
+              loadAllUsers(); // refresh all users list
+            }
+          });
+        } else {
+          alert('Cannot add yourself as friend.');
+        }
+      } else {
+        alert('User not found.');
+      }
+    });
+  } else {
+    // Add friend by uid directly (from all users list)
+    if (uid === currentUser.uid) {
+      alert('Cannot add yourself as friend.');
+      return;
+    }
+    db.ref(`friends/${currentUser.uid}/${uid}`).once('value', friendSnap => {
+      if (friendSnap.exists()) {
+        alert('Already friends!');
+      } else {
+        db.ref(`friends/${currentUser.uid}/${uid}`).set(true);
+        alert('Friend added!');
+        loadUsers();
+        loadAllUsers();
+      }
+    });
+  }
 }
 
 // Select chat from sidebar (private chat with user)
@@ -255,6 +364,14 @@ function selectChat(userId) {
   // Reload messages for new chat
   loadMessages();
 }
+
+// Load all users when logged in
+auth.onAuthStateChanged(user => {
+  if (user) {
+    loadUsers();
+    loadAllUsers();
+  }
+});
 
 // User Profile Modal
 function openUserProfile() {

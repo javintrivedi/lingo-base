@@ -189,10 +189,97 @@ body::before {
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
+.add-friend {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  gap: 10px;
+}
+
+.add-friend input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 14px;
+}
+
+.add-friend input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.add-friend button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(0, 150, 255, 0.6);
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.add-friend button:hover {
+  background: rgba(0, 150, 255, 0.8);
+}
+
 .user-list {
   flex: 1;
   overflow-y: auto;
   padding: 10px 0;
+}
+
+.find-friends {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 15px 20px;
+}
+
+.find-friends h4 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.find-friends .add-friend {
+  padding: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 10px;
+}
+
+.all-users-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.all-users-list .user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.all-users-list .user-item .user-info {
+  flex: 1;
+}
+
+.all-users-list .user-item button {
+  background: rgba(0, 150, 255, 0.6);
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.all-users-list .user-item button:hover {
+  background: rgba(0, 150, 255, 0.8);
 }
 
 .user-item {
