@@ -99,6 +99,7 @@ auth.onAuthStateChanged(user => {
       chatContainer.classList.remove("hidden");
       gsap.fromTo(chatContainer, {opacity: 0, y: 50}, {duration: 0.5, opacity: 1, y: 0});
       loadUsers();
+      loadAllUsers();
       loadMessages();
     }});
   } else {
@@ -365,13 +366,7 @@ function selectChat(userId) {
   loadMessages();
 }
 
-// Load all users when logged in
-auth.onAuthStateChanged(user => {
-  if (user) {
-    loadUsers();
-    loadAllUsers();
-  }
-});
+
 
 // User Profile Modal
 function openUserProfile() {
