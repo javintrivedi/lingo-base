@@ -29,11 +29,22 @@ const messagesDiv = document.getElementById("messages");
 
 // ✅ Signup
 function signup() {
+  const username = document.getElementById("username").value.trim();
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
+  if (!username) {
+    alert("Please enter a username.");
+    return;
+  }
+
   auth.createUserWithEmailAndPassword(email, password)
-    .then(() => {
+    .then((userCredential) => {
+      // Save username to user profile in DB
+      const user = userCredential.user;
+      db.ref(`users/${user.uid}`).update({
+        name: username
+      });
       alert("Signup successful! You can now login.");
     })
     .catch(err => alert(err.message));

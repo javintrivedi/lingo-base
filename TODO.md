@@ -7,4 +7,6 @@
 - [x] Modify loadUsers to load only friends (or friends + self)
 - [x] Add loadAllUsers to show non-friends with add button
 - [x] Update selectChat to work with friends
+- [x] Add username input to signup form
+- [x] Update signup function to save custom username
 - [x] Test the add friend functionality
